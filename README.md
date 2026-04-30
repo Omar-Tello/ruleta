@@ -23,8 +23,7 @@ Se entregarán diversos regalos a los participantes ganadores.<br>
 
 <h2>🔗 Enlace al proyecto</h2>
 <p>
-👉 <a href="https://omar-tello.github.io/ruleta/" target="_blank">
-  👉 <a href="https://ruleta-rose.vercel.app/":// target="_blank">
+👉 <a href="https://ruleta-rose.vercel.app/" target="_blank">
   
 Ver Ruleta de Regalos
 </a>
