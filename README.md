@@ -1,44 +1,46 @@
+# 🎁 Antonio Raimondi – ¡Ruleta de Regalos! 🎉
 
-<h1>🎁 Antonio Raimondi – ¡Ruleta Regalos! 🎉</h1>
+Bienvenido al proyecto **“Ruleta de Regalos: Participa y Gana”**, una experiencia interactiva desarrollada para realizar sorteos dinámicos y entretenidos.
 
-<p>
-Bienvenido al proyecto <strong>“Ruleta Regalos: Participa y Gana”</strong> organizado por la institución Antonio Raimondi.
-</p>
+---
 
-<hr>
+## 📌 Descripción
 
-<h2>📌 Descripción</h2>
-<p>
-Este proyecto ha sido creado con el propósito de incentivar la participación de la comunidad mediante una dinámica interactiva, 
-en la cual los participantes pueden acceder a diferentes premios.
-</p>
+Este proyecto fue creado con el objetivo de incentivar la participación de la comunidad mediante una ruleta interactiva con animaciones, sonidos y premios personalizados.
 
-<h2>🏆 Premios</h2>
-<p>
-Se entregarán diversos regalos a los participantes ganadores.<br>
-<strong>¡Mientras más participes, más oportunidades tendrás!</strong>
-</p>
+Los participantes podrán girar la ruleta y descubrir automáticamente el premio ganador.
 
-<hr>
+---
 
-<h2>🔗 Enlace al proyecto</h2>
-<p>
-👉 <a href="https://ruleta-rose.vercel.app/" target="_blank">
-  
-Ver Ruleta de Regalos
-</a>
-</p>
+## 🏆 Características
 
-<hr>
+- 🎡 Ruleta animada e interactiva
+- 🎉 Efectos visuales y confeti
+- 🔊 Sonidos durante el sorteo
+- 🏅 Premios personalizados
+- 📱 Diseño adaptable y moderno
+- ⚡ Interfaz rápida y dinámica
 
-<h2>🚀 Tecnologías utilizadas</h2>
-<ul>
-  <li>HTML</li>
-  <li>CSS</li>
-  <li>JavaScript</li>
-</ul>
+---
 
-<h2>📢 Autor</h2>
-<p>
-Desarrollado por Omar Tello
-</p>
+## 🔗 Enlaces del Proyecto
+
+### 🚀 GitHub Pages
+👉 https://omar-tello.github.io/ruleta/
+
+### 🌐 Vercel
+👉 https://ruleta-rose.vercel.app/
+
+---
+
+## 🚀 Tecnologías Utilizadas
+
+- HTML5
+- CSS3
+- JavaScript
+
+---
+
+## 📢 Autor
+
+Desarrollado por **Omar Tello**
