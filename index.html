@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo Profesional</title>
+    <style>
+        /* Variables y Fuentes */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+        
+        :root {
+            --primary: #0161AA;
+            --secondary: #FE910D;
+            --dark: #001B36;
+            --light: #F4F4F9;
+            --success: #90C708;
+            --text-color: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #01437B, #0161AA);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Utilidades */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--primary), #004A85);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(1, 97, 170, 0.4);
+            filter: brightness(1.1);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 14px;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Pantalla Inicial */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease-out;
+        }
+
+        .img-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #start-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 26px;
+            font-weight: 800;
+            padding: 20px 50px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #0161AA, #00BCD4, #FE910D);
+            background-size: 200% auto;
+            color: white;
+            border: 3px solid rgba(255,255,255,0.4);
+            box-shadow: 0 0 20px rgba(1, 97, 170, 0.6), 0 0 40px rgba(254, 145, 13, 0.4);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out, transform 0.3s ease, box-shadow 0.3s ease;
+            animation: attentionSeeker 3s infinite, gradientMove 3s infinite linear;
+            cursor: pointer;
+        }
+
+        #start-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 0 30px rgba(1, 97, 170, 0.8), 0 0 60px rgba(254, 145, 13, 0.6);
+            animation: gradientMove 1.5s infinite linear;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes attentionSeeker {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            5% { transform: translateX(-50%) scale(1.05) rotate(2deg); }
+            10% { transform: translateX(-50%) scale(1.05) rotate(-2deg); }
+            15% { transform: translateX(-50%) scale(1.05) rotate(2deg); }
+            20% { transform: translateX(-50%) scale(1) rotate(0); }
+        }
+
+        /* App Principal */
+        #app-container {
+            display: none;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Secciones */
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        /* Listas */
+        .list-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+
+        .list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .list-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .list-item {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .list-item.delivered {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Ruleta */
+        .roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .roulette-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin-bottom: 30px;
+            border-radius: 50px;
+        }
+        
+        .lights {
+            position: absolute;
+            top: -15px; left: -15px; right: -15px; bottom: -15px;
+            border-radius: 50%;
+            border: 4px dotted var(--primary);
+            animation: rotateLights 10s linear infinite;
+            pointer-events: none;
+        }
+
+        #wheel-canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.15, 1);
+            background: #fff;
+        }
+
+        .pointer {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            transform: translateY(-50%);
+            width: 0; 
+            height: 0; 
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-right: 40px solid var(--primary);
+            z-index: 10;
+            filter: drop-shadow(-2px 0px 5px rgba(0,0,0,0.5));
+        }
+        
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #fff, #ddd);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #spin-btn {
+            font-size: 20px;
+            padding: 15px 40px;
+            width: 250px;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .winner-name-display {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--success);
+            margin: 20px 0;
+            text-transform: uppercase;
+            animation: popIn 0.5s ease;
+        }
+        
+        .suspense-text {
+            font-size: 24px;
+            animation: pulse 1s infinite;
+            color: #FFD700;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        /* Animaciones */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes rotateLights {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            #app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .roulette-wrapper {
+                width: 350px;
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio de Fondo (Autoplay forzado por HTML) -->
+    <audio id="bgMusic" src="efecto inicial.mp3" autoplay loop></audio>
+
+    <!-- Canvas para Confeti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Pantalla Inicial -->
+    <div id="splash-screen">
+        <div class="img-container">
+            <img src="imagen%20inicial.png" alt="Sorteo Inicial">
+        </div>
+        <button id="start-btn" onclick="startApp()">INICIAR SORTEO</button>
+    </div>
+
+    <!-- App Principal -->
+    <div id="app-container">
+        <!-- Panel Izquierdo: Premios -->
+        <div class="glass-panel" style="display: flex; flex-direction: column;">
+            <h2 class="section-title">Premios</h2>
+            
+            <div>
+                <input type="text" id="prize-input" placeholder="Nombre del premio...">
+                <button onclick="addPrize()" style="width: 100%; margin-bottom: 20px;">Agregar Premio</button>
+            </div>
+            
+            <h3>Premios Disponibles</h3>
+            <div id="available-prizes-list" class="list-container"></div>
+            
+            <h3>Premios Entregados</h3>
+            <div id="delivered-prizes-list" class="list-container"></div>
+            
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                <button onclick="resetData()" style="background: transparent; border: 1px solid var(--primary); width: 100%;">Reiniciar Todo</button>
+            </div>
+        </div>
+
+        <!-- Centro: Ruleta -->
+        <div class="roulette-container glass-panel">
+            <div class="roulette-wrapper">
+                <div class="lights"></div>
+                <canvas id="wheel-canvas" width="500" height="500"></canvas>
+                <div class="pointer"></div>
+                <div class="center-dot"></div>
+            </div>
+            
+            <div id="current-prize-display" style="font-size: 20px; font-weight: bold; color: #FFD700; margin-bottom: 15px; height: 30px;">
+                <!-- Premio actual -->
+            </div>
+
+            <button id="spin-btn" onclick="spinWheel()">GIRAR RULETA</button>
+        </div>
+
+        <!-- Panel Derecho: Participantes y Resultados -->
+        <div class="glass-panel" style="display: flex; flex-direction: column;">
+            <h2 class="section-title">Participantes</h2>
+            
+            <div>
+                <textarea id="participants-input" rows="4" placeholder="Pega lista separada por líneas o ingresa un nombre..."></textarea>
+                <button onclick="addParticipants()" style="width: 100%; margin-bottom: 20px;">Agregar Participantes</button>
+            </div>
+            
+            <h3>En Lista (<span id="participant-count">0</span>)</h3>
+            <div id="participants-list" class="list-container"></div>
+            
+            <h2 class="section-title" style="margin-top: 20px;">Historial</h2>
+            <div id="history-list" class="list-container"></div>
+            
+            <button onclick="exportHistory()" style="background: var(--success); width: 100%; margin-top: auto;">Exportar Ganadores</button>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    
+    <!-- Modal de Pregunta Primer Premio -->
+    <div id="first-prize-modal" class="modal-overlay">
+        <div class="glass-panel modal-content">
+            <h2>Configuración del Primer Premio</h2>
+            <p>¿El primer premio será al primer intento?</p>
+            <div class="modal-buttons">
+                <button onclick="setFirstTryConfig(true)">Sí, a la primera</button>
+                <button onclick="setFirstTryConfig(false)" style="background: #333;">No, requiere confirmación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación Manual (Si No es al primer intento) -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="glass-panel modal-content">
+            <h2>Posible Ganador...</h2>
+            <div class="winner-name-display" id="possible-winner-name">Nombre</div>
+            <p id="suspense-msg" class="suspense-text">¿Es válido el ganador?</p>
+            <div class="modal-buttons" id="confirm-buttons" style="display: none;">
+                <button onclick="confirmWinner(true)" style="background: var(--success);">Sí, es Válido</button>
+                <button onclick="confirmWinner(false)" style="background: var(--primary);">No, volver a girar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ganador Celebración -->
+    <div id="winner-modal" class="modal-overlay">
+        <div class="glass-panel modal-content" style="background: rgba(0,230,118,0.2); border-color: var(--success);">
+            <h2>¡TENEMOS UN GANADOR!</h2>
+            <div class="winner-name-display" id="final-winner-name">Nombre</div>
+            <p style="font-size: 18px;">Ganó: <strong id="won-prize-name" style="color: #FFD700;">Premio</strong></p>
+            <div class="modal-buttons">
+                <button onclick="closeWinnerModal()">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // ESTADO DE LA APLICACIÓN
+        let state = {
+            participants: [],
+            availablePrizes: [],
+            deliveredPrizes: [],
+            history: [],
+            isFirstPrize: true,
+            isFirstTrySetup: false, // true = primer intento gana, false = requiere confirmación
+            currentSpinWinner: null
+        };
+
+        // AUDIO
+        const bgMusic = document.getElementById('bgMusic');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playWinnerSound() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const freqs = [523.25, 659.25, 783.99, 1046.50]; // Acorde alegre C Mayor
+            freqs.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, now + (i * 0.15));
+                gain.gain.linearRampToValueAtTime(0.3, now + (i * 0.15) + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.15) + 1.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + (i * 0.15));
+                osc.stop(now + (i * 0.15) + 1.5);
+            });
+        }
+        function playTick() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // CONFETTI ENGINE (Vanilla JS)
+        const canvasConfetti = document.getElementById('confetti-canvas');
+        const ctxConfetti = canvasConfetti.getContext('2d');
+        canvasConfetti.width = window.innerWidth;
+        canvasConfetti.height = window.innerHeight;
+        let particles = [];
+        const colors = ['#0161AA', '#90C708', '#FE910D', '#004A85', '#FFAD42'];
+
+        function createConfetti() {
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: canvasConfetti.width / 2,
+                    y: canvasConfetti.height / 2,
+                    r: Math.random() * 6 + 2,
+                    dx: Math.random() * 20 - 10,
+                    dy: Math.random() * -20 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+        }
+
+        function drawConfetti() {
+            ctxConfetti.clearRect(0, 0, canvasConfetti.width, canvasConfetti.height);
+            particles.forEach((p, index) => {
+                p.tiltAngle += p.tiltAngleInc;
+                p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle) * 2;
+                p.dy += 0.1; // gravedad
+                p.x += p.dx;
+                p.y += p.dy;
+
+                ctxConfetti.beginPath();
+                ctxConfetti.lineWidth = p.r;
+                ctxConfetti.strokeStyle = p.color;
+                ctxConfetti.moveTo(p.x + p.tilt + p.r, p.y);
+                ctxConfetti.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                ctxConfetti.stroke();
+
+                if (p.y > canvasConfetti.height) particles.splice(index, 1);
+            });
+            if (particles.length > 0) requestAnimationFrame(drawConfetti);
+        }
+
+        function fireConfetti() {
+            createConfetti();
+            drawConfetti();
+        }
+
+        window.addEventListener('resize', () => {
+            canvasConfetti.width = window.innerWidth;
+            canvasConfetti.height = window.innerHeight;
+            drawWheel();
+        });
+
+        // INICIALIZACIÓN
+        function startApp() {
+            clearInterval(splashConfettiInterval);
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'grid';
+                loadData();
+                fireConfetti(); // Confeti al iniciar
+            }, 1000);
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('sorteoState');
+            if (saved) {
+                state = JSON.parse(saved);
+                if(state.isFirstPrize === undefined) state.isFirstPrize = true;
+            }
+            updateUI();
+            drawWheel();
+        }
+
+        function saveData() {
+            localStorage.setItem('sorteoState', JSON.stringify(state));
+        }
+
+        function resetData() {
+            if(confirm("¿Estás seguro de reiniciar todo el sorteo? Se perderán listas y ganadores.")) {
+                state = {
+                    participants: [],
+                    availablePrizes: [],
+                    deliveredPrizes: [],
+                    history: [],
+                    isFirstPrize: true,
+                    isFirstTrySetup: false,
+                    currentSpinWinner: null
+                };
+                saveData();
+                updateUI();
+                drawWheel();
+            }
+        }
+
+        // PARTICIPANTES
+        function addParticipants() {
+            const input = document.getElementById('participants-input').value;
+            if(!input.trim()) return;
+            
+            const names = input.split('\n').map(n => n.trim()).filter(n => n !== '');
+            // Filtrar duplicados en la lista actual
+            const newNames = names.filter(n => !state.participants.includes(n));
+            
+            state.participants.push(...newNames);
+            document.getElementById('participants-input').value = '';
+            saveData();
+            updateUI();
+            drawWheel();
+        }
+
+        // PREMIOS
+        function addPrize() {
+            const input = document.getElementById('prize-input').value;
+            if(!input.trim()) return;
+            
+            state.availablePrizes.push(input.trim());
+            document.getElementById('prize-input').value = '';
+            saveData();
+            updateUI();
+        }
+
+        // UI ACTUALIZACIÓN
+        function updateUI() {
+            // Participantes
+            document.getElementById('participant-count').innerText = state.participants.length;
+            const pList = document.getElementById('participants-list');
+            pList.innerHTML = '';
+            state.participants.forEach((p, i) => {
+                pList.innerHTML += `<div class="list-item"><span>${p}</span> <button onclick="removeParticipant(${i})" style="padding:2px 8px; font-size:10px;">X</button></div>`;
+            });
+
+            // Premios Disponibles
+            const aPrizesList = document.getElementById('available-prizes-list');
+            aPrizesList.innerHTML = '';
+            state.availablePrizes.forEach((p, i) => {
+                aPrizesList.innerHTML += `<div class="list-item"><span>🎁 ${p}</span> <button onclick="removePrize(${i})" style="padding:2px 8px; font-size:10px;">X</button></div>`;
+            });
+
+            // Premios Entregados
+            const dPrizesList = document.getElementById('delivered-prizes-list');
+            dPrizesList.innerHTML = '';
+            state.deliveredPrizes.forEach(p => {
+                dPrizesList.innerHTML += `<div class="list-item delivered"><span>✅ ${p}</span></div>`;
+            });
+
+            // Historial
+            const hList = document.getElementById('history-list');
+            hList.innerHTML = '';
+            state.history.forEach(h => {
+                hList.innerHTML += `<div class="list-item" style="border-left: 3px solid var(--success);">
+                    <div><strong>${h.winner}</strong><br><small>${h.prize}</small></div>
+                </div>`;
+            });
+
+            // Premio actual
+            const currentPrize = state.availablePrizes.length > 0 ? state.availablePrizes[0] : "No hay premios registrados";
+            document.getElementById('current-prize-display').innerText = state.availablePrizes.length > 0 ? `Sorteando: ${currentPrize}` : '';
+            
+            // Botón girar
+            document.getElementById('spin-btn').disabled = state.participants.length === 0 || state.availablePrizes.length === 0;
+        }
+
+        function removeParticipant(index) {
+            state.participants.splice(index, 1);
+            saveData();
+            updateUI();
+            drawWheel();
+        }
+
+        function removePrize(index) {
+            state.availablePrizes.splice(index, 1);
+            saveData();
+            updateUI();
+        }
+
+        // RULETA ENGINE
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        let currentRotation = 0;
+        let isSpinning = false;
+        
+        function drawWheel() {
+            const numSlices = state.participants.length;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (numSlices === 0) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#eee';
+                ctx.fill();
+                ctx.fillStyle = '#999';
+                ctx.font = '20px Montserrat';
+                ctx.textAlign = 'center';
+                ctx.fillText('Agrega participantes', centerX, centerY);
+                return;
+            }
+
+            const sliceAngle = (2 * Math.PI) / numSlices;
+
+            for (let i = 0; i < numSlices; i++) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, i * sliceAngle, (i + 1) * sliceAngle);
+                ctx.closePath();
+                const palette = ['#FF3366', '#4A00E0', '#00BCD4', '#FF9800', '#9C27B0', '#E91E63', '#3F51B5', '#009688', '#4CAF50', '#FFC107'];
+                ctx.fillStyle = palette[i % palette.length];
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+
+                // Texto
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(i * sliceAngle + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px Montserrat';
+                // Truncar texto si es muy largo
+                let text = state.participants[i];
+                if(text.length > 15) text = text.substring(0, 15) + '...';
+                ctx.fillText(text, radius - 20, 5);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (isSpinning || state.participants.length === 0 || state.availablePrizes.length === 0) return;
+            
+            // Pregunta del primer premio
+            if (state.isFirstPrize) {
+                document.getElementById('first-prize-modal').style.display = 'flex';
+                return;
+            }
+
+            executeSpin();
+        }
+
+        function setFirstTryConfig(isFirstTry) {
+            state.isFirstTrySetup = isFirstTry;
+            state.isFirstPrize = false;
+            saveData();
+            document.getElementById('first-prize-modal').style.display = 'none';
+            executeSpin();
+        }
+
+        function executeSpin() {
+            bgMusic.pause();
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+
+            const numSlices = state.participants.length;
+            const sliceAngle = 360 / numSlices;
+            
+            // Elegir ganador aleatorio
+            const winnerIndex = Math.floor(Math.random() * numSlices);
+            
+            // Calcular rotación
+            // Queremos que el ganador quede a los 0 grados (a la derecha)
+            // Cada giro completo son 360. Damos 5-10 vueltas extra.
+            const extraSpins = 360 * (5 + Math.floor(Math.random() * 5));
+            // Offset para que caiga en medio de la rebanada
+            const randomOffset = (sliceAngle * 0.2) + Math.random() * (sliceAngle * 0.6); 
+            
+            // Ángulo necesario para que el índice gane (teniendo en cuenta la rotación de CSS)
+            // La flecha está a la derecha (0 grados)
+            // Las rebanadas se dibujan de 0 en adelante. 
+            // Para que la rebanada 'i' esté en 0, tenemos que rotar negativamente o ajustar
+            const targetAngle = 360 - (winnerIndex * sliceAngle) - randomOffset;
+            
+            currentRotation = currentRotation + extraSpins + targetAngle - (currentRotation % 360);
+
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            // Sonido de giro
+            let tickInterval = setInterval(playTick, 200);
+            setTimeout(() => clearInterval(tickInterval), 3000);
+            setTimeout(() => { tickInterval = setInterval(playTick, 400); }, 3000);
+            setTimeout(() => clearInterval(tickInterval), 4000);
+
+            setTimeout(() => {
+                bgMusic.play().catch(e => console.log('Audio resume blocked', e));
+                isSpinning = false;
+                state.currentSpinWinner = state.participants[winnerIndex];
+                
+                if (state.isFirstTrySetup) {
+                    // Ganador directo
+                    processWinner(true);
+                } else {
+                    // Modal de confirmación manual
+                    showConfirmModal();
+                }
+            }, 5000); // 5s es la duración de la transición CSS
+        }
+
+        function showConfirmModal() {
+            document.getElementById('possible-winner-name').innerText = state.currentSpinWinner;
+            document.getElementById('suspense-msg').style.display = 'block';
+            document.getElementById('confirm-buttons').style.display = 'none';
+            document.getElementById('confirm-modal').style.display = 'flex';
+
+            // Animación de suspenso
+            setTimeout(() => {
+                document.getElementById('suspense-msg').style.display = 'none';
+                document.getElementById('confirm-buttons').style.display = 'flex';
+            }, 2000);
+        }
+
+        function confirmWinner(isValid) {
+            document.getElementById('confirm-modal').style.display = 'none';
+            if (isValid) {
+                processWinner(true);
+            } else {
+                // No válido, remover si se desea o solo volver a girar. El prompt dice "Permitir repetir intentos".
+                // Dejamos al participante en la lista
+                document.getElementById('spin-btn').disabled = false;
+            }
+        }
+
+        function processWinner(isValid) {
+            const winner = state.currentSpinWinner;
+            const prize = state.availablePrizes.shift(); // Quita el primero
+            
+            state.deliveredPrizes.push(prize);
+            state.history.push({ winner, prize });
+            
+            // Remover ganador
+            state.participants = state.participants.filter(p => p !== winner);
+            
+            saveData();
+            updateUI();
+            
+            // Mostrar Modal de Ganador
+            document.getElementById('final-winner-name').innerText = winner;
+            document.getElementById('won-prize-name').innerText = prize;
+            document.getElementById('winner-modal').style.display = 'flex';
+            
+            playWinnerSound();
+            fireConfetti();
+        }
+
+        function closeWinnerModal() {
+            document.getElementById('winner-modal').style.display = 'none';
+            drawWheel();
+            document.getElementById('spin-btn').disabled = state.participants.length === 0 || state.availablePrizes.length === 0;
+        }
+
+        function exportHistory() {
+            if(state.history.length === 0) {
+                alert("No hay historial para exportar.");
+                return;
+            }
+            let csv = "Ganador,Premio\n";
+            state.history.forEach(h => {
+                csv += `"${h.winner}","${h.prize}"\n`;
+            });
+            const blob = new Blob(["\ufeff", csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "ganadores_sorteo.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        let splashConfettiInterval;
+
+        // Start
+        window.onload = () => {
+            fireConfetti();
+            
+            // Confeti continuo en la pantalla inicial
+            splashConfettiInterval = setInterval(() => {
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x: Math.random() * canvasConfetti.width,
+                        y: Math.random() * -50,
+                        r: Math.random() * 6 + 2,
+                        dx: Math.random() * 4 - 2,
+                        dy: Math.random() * 3 + 2,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        tilt: Math.floor(Math.random() * 10) - 10,
+                        tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                        tiltAngle: 0
+                    });
+                }
+                if (particles.length <= 5) drawConfetti();
+            }, 100);
+            
+            const playAudio = () => {
+                bgMusic.play().catch(e => console.log('Esperando interacción para audio:', e));
+            };
+            
+            playAudio();
+            // Por si el navegador bloquea el autoplay:
+            document.addEventListener('click', playAudio, { once: true });
+
+            setTimeout(() => {
+                const btn = document.getElementById('start-btn');
+                if (btn) btn.style.opacity = '1';
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
